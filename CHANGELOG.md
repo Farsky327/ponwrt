@@ -4,6 +4,11 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [Unreleased]
+
+### Changed
+- 发布产物格式由每个 target 一个 `tar.zst` 改为每个固件镜像一个独立 `zip` 包：文件名与包内固件均按 `ponwrt-airoha-<target>-<profile>-<type>-<构建时间>.zip` 命名，构建时间为北京时间 `YYYYMMDDHHMM`。不再打包 `packages/` 软件包仓库。
+
 ## [ponwrt-2026102213] - 2026-10-22
 
 首个发布版本，基于 ImmortalWrt 构建，提供 AN7581 / AN7583 两个 target 的固件。

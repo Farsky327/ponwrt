@@ -52,7 +52,7 @@ jobs:
             gettext git g++-multilib gcc-multilib gperf help2man intltool \
             libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev \
             libmpfr-dev libncurses-dev libpython3-dev libreadline-dev libssl-dev \
-            libtool libyaml-dev lld llvm ninja-build p7zip-full patch pkgconf \
+            libtool libyaml-dev lld llvm ninja-build p7zip-full patch pkgconf zip \
             python3 python3-docutils python3-pip python3-ply python3-pyelftools \
             qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo \
             uglifyjs unzip wget xmlto xxd zlib1g-dev zstd
@@ -95,15 +95,25 @@ jobs:
 
       - name: Pack ${{ matrix.target }}
         run: |
-          mkdir release
-          tar --zstd -cf "release/ponwrt-${{ matrix.target }}.tar.zst" \
-            -C bin/targets/airoha "${{ matrix.target }}"
+          mkdir -p release tmp_pkg
+          BUILD_TIME=$(TZ=Asia/Shanghai date +%Y%m%d%H%M)
+          SRC="bin/targets/airoha/${{ matrix.target }}"
+          for f in "$SRC"/*.bin "$SRC"/*.itb "$SRC"/*.fip; do
+            [ -e "$f" ] || continue
+            base=$(basename "$f")
+            stem="${base%.*}"
+            ext="${base##*.}"
+            newbase="${stem}-${BUILD_TIME}.${ext}"
+            cp "$f" "tmp_pkg/$newbase"
+            ( cd tmp_pkg && zip -q "../release/${stem}-${BUILD_TIME}.zip" "$newbase" )
+          done
+          rm -rf tmp_pkg
 
       - name: Upload ${{ matrix.target }}
         uses: actions/upload-artifact@v4
         with:
           name: ponwrt-${{ matrix.target }}
-          path: release/*.tar.zst
+          path: release/*.zip
           if-no-files-found: error
           retention-days: 7
 
@@ -124,7 +134,7 @@ jobs:
 
       - name: Create checksums
         working-directory: release
-        run: sha256sum *.tar.zst > sha256sums
+        run: sha256sum *.zip > sha256sums
 
       - name: Create GitHub release
         env:
@@ -134,7 +144,7 @@ jobs:
         run: |
           args=(
             "$RELEASE_TAG"
-            release/*.tar.zst
+            release/*.zip
             release/sha256sums
             --repo "$GITHUB_REPOSITORY"
             --target "$GITHUB_SHA"

@@ -116,6 +116,11 @@ jobs:
                      bl31-uboot preloader fip; do
               model="${model%-$t}"
             done
+            # Nokia XG-040G-MD：UBI 与 UBI-USB-SFP 为同一台设备的不同装配
+            # （profile 互为 SUPPORTED_DEVICES 别名），归并为一个型号包
+            case "$model" in
+              nokia_xg-040g-md-ubi-usb-sfp) model="nokia_xg-040g-md-ubi" ;;
+            esac
             newbase="${stem}-${BUILD_TIME}.${ext}"
             cp "$f" "tmp_pkg/$newbase"
             # zip 追加模式：同型号的后续文件自动并入同一 zip

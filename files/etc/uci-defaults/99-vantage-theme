@@ -1,0 +1,9 @@
+#!/bin/sh
+# PonWrt: 默认启用 vantage 主题（未装主题则保持默认）
+# 随 ponwrt-2026102222 引入
+[ -f /luci-static/vantage/cascade.css ] || exit 0
+
+uci -q set luci.main.mediaurlbase=/luci-static/vantage
+uci commit luci
+
+exit 0

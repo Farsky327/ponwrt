@@ -17,6 +17,7 @@
 
 ### Changed
 - **默认后台地址改为 `192.168.6.1`**（`package/base-files/files/bin/config_generate`，DHCP 池随网段自动推导为 192.168.6.x）。从 192.168.1.1 升级后需改用新地址访问。
+- **默认主机名改为 `Ponwrt`**（`config_generate`，原 `ponwrt`）。
 - **发布产物按型号合并打包**：同一型号（profile）的 `initramfs-recovery` 与 `squashfs-sysupgrade` 镜像合并为一个 zip，命名 `ponwrt-airoha-<target>-<型号>-<构建时间>.zip`；不再一个镜像一个 zip（本次构建 zip 数量由 35 个减为 18 个左右）。镜像类型后缀按白名单剥离，型号自身可含连字符（如 `fiberhome_hg5585f-cu-usb-sfp`）不受影响。
 
 ### 安装 / 升级

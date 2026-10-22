@@ -98,28 +98,35 @@ jobs:
           mkdir -p release tmp_pkg
           BUILD_TIME=$(TZ=Asia/Shanghai date +%Y%m%d%H%M)
           SRC="bin/targets/airoha/${{ matrix.target }}"
-          # 同一型号（profile）的所有镜像合并为一个 zip：
-          #   ponwrt-airoha-an7581-fiberhome_hg5585f-cu-usb-sfp-initramfs-recovery.itb
-          #   ponwrt-airoha-an7581-fiberhome_hg5585f-cu-usb-sfp-squashfs-sysupgrade.itb
-          # → ponwrt-airoha-an7581-fiberhome_hg5585f-cu-usb-sfp-<BUILD_TIME>.zip
+          # 同一设备的所有镜像合并为一个 zip（含同一设备的多 profile 变体）：
+          #   ponwrt-airoha-an7581-fiberhome_hg5585f-cu-initramfs-recovery.itb
+          #   ponwrt-airoha-an7581-fiberhome_hg5585f-cu-squashfs-sysupgrade.itb
+          #   ponwrt-airoha-an7581-fiberhome_hg5585f-cu-usb-sfp-*.itb
+          # → ponwrt-airoha-an7581-fiberhome_hg5585f-cu-<BUILD_TIME>.zip
           for f in "$SRC"/*.bin "$SRC"/*.itb "$SRC"/*.fip; do
             [ -e "$f" ] || continue
             base=$(basename "$f")
             stem="${base%.*}"
             ext="${base##*.}"
-            # 剥离镜像类型后缀得到型号；型号自身可含连字符，故按白名单剥而不是切段
+            # 剥离镜像类型后缀得到型号；型号自身可含连字符，故按白名单剥而不是切段。
+            # 长后缀优先（如 squashfs-factory-kernel 先于 squashfs-factory）
             model="$stem"
-            for t in squashfs-sysupgrade-gpt ext4-sysupgrade ext4-factory \
+            for t in squashfs-sysupgrade-gpt squashfs-factory-kernel \
+                     squashfs-factory-rootfs initramfs-uImage \
+                     ext4-sysupgrade ext4-factory \
                      initramfs-recovery initramfs-kernel \
                      squashfs-sysupgrade squashfs-factory \
                      combined-efi combined initramfs sdcard \
                      bl31-uboot preloader fip; do
               model="${model%-$t}"
             done
-            # Nokia XG-040G-MD：UBI 与 UBI-USB-SFP 为同一台设备的不同装配
-            # （profile 互为 SUPPORTED_DEVICES 别名），归并为一个型号包
+            # 同一设备的多 profile 归一化（详见 target/linux/airoha/image/*.mk 的
+            # SUPPORTED_DEVICES / DEVICE_VARIANT，互为别名的变体归并为一个型号包）：
+            #   - *-usb-sfp → 基础版（HG5585F ct/cu、XG-040G-MD ubi）
+            #   - nokia_xg-040g-mf-ubi → nokia_xg-040g-mf（NAND 出厂版与 UBI 版）
             case "$model" in
-              nokia_xg-040g-md-ubi-usb-sfp) model="nokia_xg-040g-md-ubi" ;;
+              *-usb-sfp) model="${model%-usb-sfp}" ;;
+              nokia_xg-040g-mf-ubi) model="nokia_xg-040g-mf" ;;
             esac
             newbase="${stem}-${BUILD_TIME}.${ext}"
             cp "$f" "tmp_pkg/$newbase"

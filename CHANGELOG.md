@@ -18,7 +18,7 @@
 ### Changed
 - **默认后台地址改为 `192.168.6.1`**（`package/base-files/files/bin/config_generate`，DHCP 池随网段自动推导为 192.168.6.x）。从 192.168.1.1 升级后需改用新地址访问。
 - **默认主机名改为 `Ponwrt`**（`config_generate`，原 `ponwrt`）。
-- **发布产物按型号合并打包**：同一型号（profile）的 `initramfs-recovery` 与 `squashfs-sysupgrade` 镜像合并为一个 zip，命名 `ponwrt-airoha-<target>-<型号>-<构建时间>.zip`；不再一个镜像一个 zip（本次构建 zip 数量由 35 个减为 18 个左右）。镜像类型后缀按白名单剥离，型号自身可含连字符（如 `fiberhome_hg5585f-cu-usb-sfp`）不受影响。Nokia XG-040G-MD 的 `ubi` 与 `ubi-usb-sfp` 两个 profile 为同一台设备，4 个镜像合并进同一个 `ponwrt-airoha-an7581-nokia_xg-040g-md-ubi-<构建时间>.zip`。
+- **发布产物按设备合并打包**：同一设备的所有镜像合并为一个 zip，命名 `ponwrt-airoha-<target>-<设备>-<构建时间>.zip`；不再一个镜像一个 zip。镜像类型后缀按白名单剥离（含 an7583 的 `initramfs-uImage` / `squashfs-factory-kernel` / `squashfs-factory-rootfs` / `bl31-uboot` / `preloader`），型号自身可含连字符。**同一设备的多 profile 变体归并**：FiberHome HG5585F 的 `ct`/`cu` 与各自 `-usb-sfp` 版、Nokia XG-040G-MD 的 `ubi` 与 `ubi-usb-sfp`、Nokia XG-040G-MF 的 NAND 出厂版与 `ubi` 版，分别并入同一个设备 zip（如 `ponwrt-airoha-an7583-nokia_xg-040g-mf-<构建时间>.zip` 含 8 个镜像：factory-kernel/rootfs、sysupgrade、initramfs-uImage、recovery、preloader、bl31-uboot）。
 
 ### 安装 / 升级
 - 解压对应型号的 zip，其中 `*-initramfs-recovery.itb` 用于 recovery 刷入，`*-squashfs-sysupgrade.itb` 用于 sysupgrade 升级。

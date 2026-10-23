@@ -10,7 +10,8 @@
 
  PonWrt customization: brand mark is a "P" (white stem + green bowl) with
  the green dot, and the brand word reads "Ponwrt". Overlaid from the ponwrt
- repo's top-level files/ (see files/usr/share/ucode/template/themes/vantage).
+ repo's top-level files/ (see files/usr/share/ucode/luci/template/themes/vantage;
+ luci.mk installs ucode/ to UCODE_LIBRARYDIR=/usr/share/ucode/luci).
 -#}
 {%
 	const authed = !!ctx.authsession;

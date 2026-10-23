@@ -4,6 +4,19 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [ponwrt-2026102312] - 2026-10-23
+
+修复 `ponwrt-2026102309` 中 Ponwrt 品牌定制未生效的问题（界面仍显示 Vantage），其余内容不变。
+
+### Fixed
+- **品牌定制 overlay 路径错误**：vantage 主题的 `header.ut` 由 luci feed 的 `luci.mk` 安装到 `UCODE_LIBRARYDIR=/usr/share/ucode/luci/template/themes/vantage/`，此前 overlay 放在了 `/usr/share/ucode/template/themes/vantage/`（少了 `luci/` 一层），文件从未覆盖主题包内的同名模板，侧栏/顶栏仍渲染上游的 V 形 logo 与 `Vantage` 字样。已移至正确路径。
+- **登录页品牌未定制**：登录页由主题的 `sysauth.ut` 渲染（非 `header.ut`），此前未做定制，登录页一直显示 V 形 logo 与 `Vantage`。现已同步改为 P 形 logo（白竖 + 绿碗 + 绿点）与 `Ponwrt`。
+- **默认主题检查失效**：`files/etc/uci-defaults/99-vantage-theme` 的存在性检查写成 `/luci-static/vantage/cascade.css`——`/luci-static` 是 URL 前缀而非文件系统路径（实际在 `/www/luci-static` 下），且主题主样式表是 `vantage.css` 而非 `cascade.css`，检查永远失败，默认主题实际从未自动生效（此前界面为 vantage 是手动选择的）。已改为检查 `/www/luci-static/vantage/vantage.css`，刷完即默认 vantage。
+
+### 安装 / 升级
+- 与 `ponwrt-2026102309` 相同的产物结构（10 个设备 zip + sha256sums）；如已刷 2026102309 且手动选过 vantage 主题，刷本版后品牌即为 Ponwrt；favicon 变更可能需强制刷新浏览器（Ctrl+F5）清除缓存。
+- 升级前请备份现有配置。
+
 ## [ponwrt-2026102309] - 2026-10-23
 
 迭代发版，基于 ImmortalWrt 构建，提供 AN7581 / AN7583 两个 target 的固件。相对 `ponwrt-2026102222` 的变更如下。

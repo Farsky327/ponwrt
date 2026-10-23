@@ -4,10 +4,20 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
-## [Unreleased]
+## [ponwrt-2026102217] - 2026-10-22
+
+迭代发版，基于 ImmortalWrt 构建，提供 AN7581 / AN7583 两个 target 的固件。
+
+### Added
+- **WireGuard 支持**：在 `configs/release.config` 模块化叠加层新增 `kmod-wireguard`（内核模块）、`wireguard-tools`（用户态 `wg` / `wg-quick`）、`luci-proto-wireguard`（LuCI「网络 → 接口」中的 WireGuard 协议），两个 target 构建自动并入。
 
 ### Changed
 - 发布产物格式由每个 target 一个 `tar.zst` 改为每个固件镜像一个独立 `zip` 包：文件名与包内固件均按 `ponwrt-airoha-<target>-<profile>-<type>-<构建时间>.zip` 命名，构建时间为北京时间 `YYYYMMDDHHMM`。不再打包 `packages/` 软件包仓库。
+- 清理 `configs/an7581.config` / `configs/an7583.config` 中被注释掉（未启用）的软件包行，配置文件更精简、可读，已启用的包保持不变。
+
+### 安装 / 升级
+- 固件以 `zip` 压缩分发，解压后按对应设备刷入。
+- 升级前请备份现有配置。
 
 ## [ponwrt-2026102213] - 2026-10-22
 

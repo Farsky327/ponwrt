@@ -125,6 +125,11 @@ jobs:
       contents: write
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
       - name: Download firmware archives
         uses: actions/download-artifact@v4
         with:
@@ -135,6 +140,23 @@ jobs:
       - name: Create checksums
         working-directory: release
         run: sha256sum *.zip > sha256sums
+
+      - name: Extract release notes from CHANGELOG
+        run: |
+          TAG="${{ inputs.tag }}"
+          awk -v tag="$TAG" '
+            /^## / {
+              if (capturing) exit
+              if (index($0, "[" tag "]") > 0) { capturing=1 }
+            }
+            capturing { print }
+          ' CHANGELOG.md > release-notes.md
+          if [ -s release-notes.md ]; then
+            echo "提取到 [$TAG] 的发布说明："
+            cat release-notes.md
+          else
+            echo "未在 CHANGELOG 找到 [$TAG] 段，将回退到自动生成 notes"
+          fi
 
       - name: Create GitHub release
         env:
@@ -149,8 +171,12 @@ jobs:
             --repo "$GITHUB_REPOSITORY"
             --target "$GITHUB_SHA"
             --title "PonWrt $RELEASE_TAG"
-            --generate-notes
           )
+          if [ -s release-notes.md ]; then
+            args+=(--notes-file release-notes.md)
+          else
+            args+=(--generate-notes)
+          fi
           if [ "$PRERELEASE" = true ]; then
             args+=(--prerelease)
           fi

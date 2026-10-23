@@ -121,12 +121,13 @@ jobs:
               model="${model%-$t}"
             done
             # 同一设备的多 profile 归一化（详见 target/linux/airoha/image/*.mk 的
-            # SUPPORTED_DEVICES / DEVICE_VARIANT，互为别名的变体归并为一个型号包）：
+            # SUPPORTED_DEVICES / DEVICE_VARIANT，互为别名的变体归并为一个型号包）。
+            # 注意 model 带 ponwrt-airoha-<target>- 前缀，模式必须用 * 通配：
             #   - *-usb-sfp → 基础版（HG5585F ct/cu、XG-040G-MD ubi）
-            #   - nokia_xg-040g-mf-ubi → nokia_xg-040g-mf（NAND 出厂版与 UBI 版）
+            #   - *-nokia_xg-040g-mf-ubi → nokia_xg-040g-mf（NAND 出厂版与 UBI 版）
             case "$model" in
               *-usb-sfp) model="${model%-usb-sfp}" ;;
-              nokia_xg-040g-mf-ubi) model="nokia_xg-040g-mf" ;;
+              *-nokia_xg-040g-mf-ubi) model="${model%-nokia_xg-040g-mf-ubi}-nokia_xg-040g-mf" ;;
             esac
             newbase="${stem}-${BUILD_TIME}.${ext}"
             cp "$f" "tmp_pkg/$newbase"

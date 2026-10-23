@@ -9,7 +9,7 @@
 同步 ImmortalWrt 上游（airoha 网络栈重构，升级后请重点验证有线上网与 PON 业务），并新增 VNT、EasyTier 两个异地组网应用。
 
 ### Added
-- **VNT 异地组网**：`luci-app-vnt` + `vnt` + `vnts`（lmq8267/luci-app-vnt v1.2.16，aarch64 预编译，含 LuCI 界面与中文；日志页 pcdata 兼容问题已修复）。
+- **VNT 异地组网**：`luci-app-vnt` + `vnt`（lmq8267/luci-app-vnt v1.2.16，aarch64 预编译客户端；界面中文写死于 Lua，日志页 pcdata 兼容问题已修复）。服务端 `vnts` 未默认打包，需要时可在「软件包」单独安装。
 - **EasyTier 去中心化组网**：`luci-app-easytier` + `easytier`（EasyTier v2.7.0，含 Web 控制台）+ 中文包 `luci-i18n-easytier-zh-cn`。
 
 ### Changed

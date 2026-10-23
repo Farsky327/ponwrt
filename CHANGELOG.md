@@ -4,6 +4,12 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [Unreleased]
+
+### Added
+- **VNT 异地组网**：新增 `luci-app-vnt` + `vnt` 客户端（lmq8267/luci-app-vnt v1.2.16，aarch64 预编译二进制，依赖 kmod-tun）。
+- **EasyTier 去中心化组网**：新增 `luci-app-easytier` + `easytier`（v2.7.0，含 Web 控制台）与中文包 `luci-i18n-easytier-zh-cn`。
+
 ## [ponwrt-2026102312] - 2026-10-23
 
 修复 `ponwrt-2026102309` 中 Ponwrt 品牌定制未生效的问题（界面仍显示 Vantage），其余内容不变。

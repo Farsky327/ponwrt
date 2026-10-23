@@ -15,6 +15,10 @@
 
 ### Changed
 - **默认时区改为 Asia/Shanghai（UTC+8）**：`config_generate` 中 `system.@system[0].timezone` 由 `GMT0` 改为 `CST-8`（POSIX TZ，驱动 `/tmp/TZ`），`zonename` 由 `UTC` 改为 `Asia/Shanghai`（LuCI 时区下拉显示值）。此前默认 GMT0。仅影响全新刷机的默认值，升级用户保持原有设置。
+- **网络唤醒应用更换**：`luci-app-wol` → `luci-app-wolultra`（功能更多的 WOL 客户端，来自 `Farsky327/packages` feed，自带中文翻译），中文包同步换为 `luci-i18n-wolultra-zh-cn`。
+- **feed 挂载调整**：原先单独挂载的 `anothaDev/luci-theme-vantage` feed 替换为统一的 `src-git farsky https://github.com/Farsky327/packages.git`（VIKINGYFY/packages 的 fork，附加式维护：只增不改上游已有文件，与上游 rebase 零冲突；wolultra、gecoosac 均来自该 feed）。
+- **vantage 品牌定制移入主题包**：品牌三文件（`header.ut` / `sysauth.ut` / `logo.svg`）从 ponwrt 的 `files/` overlay 移入 `Farsky327/packages` 的 `luci-theme-vantage` 定制包内维护（上游 v1.0.9 + Ponwrt 品牌 patch），品牌改为单一来源，上游主题更新时按该仓库 `SYNC.md` 重打 patch 即可，不再依赖 ponwrt 仓库的 overlay。
+- **新增 Gecoos AC 管理**：`luci-app-gecoosac` + `luci-i18n-gecoosac-zh-cn`（来自 `Farsky327/packages` feed）。
 
 ### 安装 / 升级
 - 与 `ponwrt-2026102309` 相同的产物结构（10 个设备 zip + sha256sums）；如已刷 2026102309 且手动选过 vantage 主题，刷本版后品牌即为 Ponwrt；favicon 变更可能需强制刷新浏览器（Ctrl+F5）清除缓存。

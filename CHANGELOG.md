@@ -4,6 +4,22 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [ponwrt-2026102309] - 2026-10-23
+
+迭代发版，基于 ImmortalWrt 构建，提供 AN7581 / AN7583 两个 target 的固件。相对 `ponwrt-2026102222` 的变更如下。
+
+### Added
+- **Ponwrt 品牌标识**：vantage 主题侧栏图标由 V 形改为 P 形（白竖 + 绿碗 + 绿点，沿用主题配色），品牌字由 `Vantage` 改为 `Ponwrt`，favicon 同步替换；通过 `files/` overlay 主题模板实现，明暗模式自动适配。
+
+### Changed
+- **去掉「Argon 主题设置」菜单**：argon 主题保留；ImmortalWrt 的 `luci-theme-argon` 内嵌了 argon-config 的菜单定义，故用 `files/usr/share/luci/menu.d/luci-app-argon-config.json`（空对象）覆盖，菜单不再出现。
+- **去掉「仪表盘」菜单**：不再安装 `luci-app-vantage`（Vantage 仪表盘应用），vantage 主题本身保留。
+- **发布产物修复**：Nokia XG-040G-MF 的 `mf`（NAND 出厂版）与 `mf-ubi`（UBI 版）两个 profile 归一为一个设备 zip，内含 8 个镜像；`ponwrt-2026102222` 中二者因归一化规则未匹配而分裂成两个 zip。
+
+### 安装 / 升级
+- 解压对应设备的 zip 后刷入；默认后台地址 192.168.6.1，默认主机名 Ponwrt。
+- 升级前请备份现有配置。
+
 ## [ponwrt-2026102222] - 2026-10-22
 
 迭代发版，基于 ImmortalWrt 构建，提供 AN7581 / AN7583 两个 target 的固件。

@@ -6,9 +6,22 @@
 
 ## [ponwrt-2026102323] - 2026-10-23
 
+同步 ImmortalWrt 上游（airoha 网络栈重构，升级后请重点验证有线上网与 PON 业务），并新增 VNT、EasyTier 两个异地组网应用。
+
 ### Added
-- **VNT 异地组网**：新增 `luci-app-vnt` + `vnt` 客户端（lmq8267/luci-app-vnt v1.2.16，aarch64 预编译二进制，依赖 kmod-tun）。
-- **EasyTier 去中心化组网**：新增 `luci-app-easytier` + `easytier`（v2.7.0，含 Web 控制台）与中文包 `luci-i18n-easytier-zh-cn`。
+- **VNT 异地组网**：`luci-app-vnt` + `vnt` + `vnts`（lmq8267/luci-app-vnt v1.2.16，aarch64 预编译，含 LuCI 界面与中文；日志页 pcdata 兼容问题已修复）。
+- **EasyTier 去中心化组网**：`luci-app-easytier` + `easytier`（EasyTier v2.7.0，含 Web 控制台）+ 中文包 `luci-i18n-easytier-zh-cn`。
+
+### Changed
+- **同步 ImmortalWrt 上游**（约 200 个提交）：airoha 网络驱动重构（PON 数据路径、MTU、LRO offload、QoS backport、设备树 overlay），an7581/an7583 有线口与 PON 行为有变化，升级后请验证上网与 VoIP/IPTV；本地定制全部保留，合并零冲突。
+- **feed 包清单扩充**：`Farsky327/packages` feed 新增 VNT/EasyTier 共 6 个包（vantage 定制主题、wolultra、gecoosac、VNT、EasyTier 均来自该 feed）。
+
+### 安装 / 升级
+- 产物结构同上一版（an7581 九个设备 zip + an7583 的 mf zip + sha256sums）；sysupgrade 用 `*-squashfs-sysupgrade*.itb`，recovery 用 `*-initramfs-recovery*.itb`。
+- 因网络驱动重构，升级前请备份配置，升级后检查网口协商速率、PON 光信号与拨号状态。
+- 两个组网应用首次进入镜像，如遇问题可在「系统 → 软件包」单独移除，不影响其他功能。
+
+> 本文件为简洁版发布说明；各版本的详细变更记录（根因、机制、技术决策与验证过程）见本地 `docs/CHANGELOG-detail.md`。
 
 ## [ponwrt-2026102312] - 2026-10-23
 

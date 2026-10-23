@@ -4,7 +4,7 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
-## [Unreleased]
+## [ponwrt-2026102323] - 2026-10-23
 
 ### Added
 - **VNT 异地组网**：新增 `luci-app-vnt` + `vnt` 客户端（lmq8267/luci-app-vnt v1.2.16，aarch64 预编译二进制，依赖 kmod-tun）。

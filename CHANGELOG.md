@@ -13,6 +13,9 @@
 - **登录页品牌未定制**：登录页由主题的 `sysauth.ut` 渲染（非 `header.ut`），此前未做定制，登录页一直显示 V 形 logo 与 `Vantage`。现已同步改为 P 形 logo（白竖 + 绿碗 + 绿点）与 `Ponwrt`。
 - **默认主题检查失效**：`files/etc/uci-defaults/99-vantage-theme` 的存在性检查写成 `/luci-static/vantage/cascade.css`——`/luci-static` 是 URL 前缀而非文件系统路径（实际在 `/www/luci-static` 下），且主题主样式表是 `vantage.css` 而非 `cascade.css`，检查永远失败，默认主题实际从未自动生效（此前界面为 vantage 是手动选择的）。已改为检查 `/www/luci-static/vantage/vantage.css`，刷完即默认 vantage。
 
+### Changed
+- **默认时区改为 Asia/Shanghai（UTC+8）**：`config_generate` 中 `system.@system[0].timezone` 由 `GMT0` 改为 `CST-8`（POSIX TZ，驱动 `/tmp/TZ`），`zonename` 由 `UTC` 改为 `Asia/Shanghai`（LuCI 时区下拉显示值）。此前默认 GMT0。仅影响全新刷机的默认值，升级用户保持原有设置。
+
 ### 安装 / 升级
 - 与 `ponwrt-2026102309` 相同的产物结构（10 个设备 zip + sha256sums）；如已刷 2026102309 且手动选过 vantage 主题，刷本版后品牌即为 Ponwrt；favicon 变更可能需强制刷新浏览器（Ctrl+F5）清除缓存。
 - 升级前请备份现有配置。

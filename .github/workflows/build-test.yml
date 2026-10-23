@@ -1,0 +1,133 @@
+name: Build Test an7581
+
+# 测试专用：只构建 an7581 一个 target，不出 Release，产物以 build artifact 形式
+# 挂在 Actions 页面供下载验证（默认 7 天）。用于快速验证固件改动（如主题、默认
+# 配置），不必等 release.yml 的双 target 全量构建 + 发版流程。
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: '构建标识（仅用于 artifact 命名，如 test / logo）'
+        required: false
+        default: test
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-test-an7581
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build an7581 (${{ inputs.tag }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    environment: release
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Free build space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo apt-get clean
+
+      - name: Install build dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            asciidoc autoconf automake autopoint binutils bison build-essential \
+            bzip2 ccache clang cmake cpio curl device-tree-compiler flex gawk \
+            gettext git g++-multilib gcc-multilib gperf help2man intltool \
+            libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev \
+            libmpfr-dev libncurses-dev libpython3-dev libreadline-dev libssl-dev \
+            libtool libyaml-dev lld llvm ninja-build p7zip-full patch pkgconf zip \
+            python3 python3-docutils python3-pip python3-ply python3-pyelftools \
+            qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo \
+            uglifyjs unzip wget xmlto xxd zlib1g-dev zstd
+
+      - name: Cache downloads
+        uses: actions/cache@v4
+        with:
+          path: dl
+          key: ponwrt-dl-an7581-${{ hashFiles('feeds.conf.default', 'configs/*.config') }}
+          restore-keys: |
+            ponwrt-dl-an7581-
+
+      - name: Install feeds
+        run: |
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: Load repository signing key
+        env:
+          PONWRT_APK_PRIVATE_KEY: ${{ secrets.PONWRT_APK_PRIVATE_KEY }}
+        run: |
+          if [ -n "$PONWRT_APK_PRIVATE_KEY" ]; then
+            umask 077
+            printf '%s\n' "$PONWRT_APK_PRIVATE_KEY" > private-key.pem
+            openssl ec -in private-key.pem -pubout -out public-key.pem
+          fi
+
+      - name: Configure an7581
+        run: |
+          ./scripts/kconfig.pl + \
+            configs/an7581.config \
+            configs/release.config > .config
+          make defconfig
+
+      - name: Download sources
+        run: make download -j"$(nproc)"
+
+      - name: Build an7581
+        run: make -j"$(nproc)"
+
+      # 与 release.yml 的 Pack 步骤保持一致：同一设备的所有镜像合并为一个 zip
+      # （含同一设备的多 profile 变体），产物结构正式发版相同。
+      - name: Pack an7581
+        run: |
+          mkdir -p release tmp_pkg
+          BUILD_TIME=$(TZ=Asia/Shanghai date +%Y%m%d%H%M)
+          SRC="bin/targets/airoha/an7581"
+          for f in "$SRC"/*.bin "$SRC"/*.itb "$SRC"/*.fip; do
+            [ -e "$f" ] || continue
+            base=$(basename "$f")
+            stem="${base%.*}"
+            ext="${base##*.}"
+            # 剥离镜像类型后缀得到型号；型号自身可含连字符，故按白名单剥而不是切段。
+            # 长后缀优先（如 squashfs-factory-kernel 先于 squashfs-factory）
+            model="$stem"
+            for t in squashfs-sysupgrade-gpt squashfs-factory-kernel \
+                     squashfs-factory-rootfs initramfs-uImage \
+                     ext4-sysupgrade ext4-factory \
+                     initramfs-recovery initramfs-kernel \
+                     squashfs-sysupgrade squashfs-factory \
+                     combined-efi combined initramfs sdcard \
+                     bl31-uboot preloader fip; do
+              model="${model%-$t}"
+            done
+            # 同一设备的多 profile 归一化；model 带 ponwrt-airoha-an7581- 前缀，
+            # 模式必须用 * 通配：
+            #   - *-usb-sfp → 基础版（HG5585F ct/cu、XG-040G-MD ubi）
+            case "$model" in
+              *-usb-sfp) model="${model%-usb-sfp}" ;;
+            esac
+            newbase="${stem}-${BUILD_TIME}.${ext}"
+            cp "$f" "tmp_pkg/$newbase"
+            # zip 追加模式：同型号的后续文件自动并入同一 zip
+            ( cd tmp_pkg && zip -q "../release/${model}-${BUILD_TIME}.zip" "$newbase" )
+          done
+          rm -rf tmp_pkg
+          echo "=== 打包结果（按型号合并） ==="
+          ls -la release/
+
+      - name: Upload an7581
+        uses: actions/upload-artifact@v4
+        with:
+          name: ponwrt-an7581-${{ inputs.tag }}
+          path: release/*.zip
+          if-no-files-found: error
+          retention-days: 7

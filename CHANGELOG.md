@@ -6,14 +6,17 @@
 
 ## [ponwrt-2026102409] - 2026-10-24
 
-修复 VNT 应用组件缺失导致的日志刷屏：补齐服务端 `vnts` 与 `curl`。
+修复 VNT 应用组件缺失导致的日志刷屏，并补充一排障工具。
 
 ### Fixed
 - **VNT 服务端组件缺失**：镜像新增 `vnts`（v1.2.12，aarch64 预编译）。此前只含客户端 `vnt-cli`，luci-app-vnt 的服务端配置、服务端日志与版本检查均不可用，VNT 状态页每 3 秒报一次 `daemon.err: /usr/bin/vnts: not found`。
 - **curl 缺失**：镜像新增 `curl`。luci-app-vnt 与 luci-app-easytier 的版本检查都要用 curl 查询 GitHub API，缺 curl 时两个应用的状态页都会持续报 `daemon.err: curl: not found`。
 
+### Added
+- **排障工具箱**：`unzip`（自带 zipinfo）、`htop`、`bash`、`openssl-util`（openssl 命令行）、`iwinfo`、`parted`、`lsblk`。
+
 ### 安装 / 升级
-- 从 ponwrt-2026102323 升级刷 sysupgrade 即可（保留配置）；`vnts` 与 `curl` 随镜像提供，无需手动安装。
+- 从 ponwrt-2026102323 升级刷 sysupgrade 即可（保留配置）；新增软件随镜像提供，无需手动安装。
 - 其余内容与 ponwrt-2026102323 一致（上游同步 + VNT/EasyTier 组网应用）。
 
 > 本文件为简洁版发布说明；各版本的详细变更记录（根因、机制、技术决策与验证过程）见本地 `docs/CHANGELOG-detail.md`。

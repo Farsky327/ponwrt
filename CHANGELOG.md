@@ -14,6 +14,9 @@
 
 ### Added
 - **排障工具箱**：`unzip`（自带 zipinfo）、`htop`、`bash`、`openssl-util`（openssl 命令行）、`iwinfo`、`parted`、`lsblk`。
+- **定时重启**：`luci-app-autoreboot`（含中文）。
+- **OpenSSH 组件**：`openssh-keygen`、`openssh-sftp-server`。
+- **USB 与网络内核模块**：`kmod-usb-ohci`、`kmod-usb-uhci`（USB 1.1 主机控制器）、`kmod-usb-storage-extras`、`kmod-usb-storage-uas`、`kmod-veth`（虚拟以太网）。
 
 ### 安装 / 升级
 - 从 ponwrt-2026102323 升级刷 sysupgrade 即可（保留配置）；新增软件随镜像提供，无需手动安装。
